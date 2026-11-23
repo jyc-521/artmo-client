@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { supabase } from '../config/supabase';
 
-const baseURL = (import.meta.env.VITE_API_BASE_URL ?? '').trim().replace(/\/+$/, '');
+export const baseURL = (import.meta.env.VITE_API_BASE_URL ?? '').trim().replace(/\/+$/, '');
 
 // 공개 요청은 토큰 없이, 로그인 요청은 Bearer 토큰을 자동으로 붙인다. 쿠키는 쓰지 않는다.
 export const publicApi = axios.create({ baseURL, timeout: 30000, withCredentials: false });

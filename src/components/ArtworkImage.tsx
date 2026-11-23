@@ -7,7 +7,8 @@ interface Props {
   loading?: 'lazy' | 'eager';
 }
 
-// crossOrigin은 카드 이미지(PNG) 생성 때 캔버스에 그릴 수 있게 하려는 설정이다.
+// 화면 표시용. 미술관 이미지 서버가 CORS 헤더를 주지 않으므로 crossOrigin을 붙이지 않는다(붙이면 로드 실패).
+// 공유 카드 PNG는 서버의 /api/artworks/:id/image를 거쳐 그린다(ShareCard).
 export default function ArtworkImage({ artwork, className, loading = 'lazy' }: Props) {
   const [failed, setFailed] = useState(false);
   if (failed) {
@@ -23,7 +24,7 @@ export default function ArtworkImage({ artwork, className, loading = 'lazy' }: P
       className={className}
       src={artwork.imageUrl}
       alt={`${artwork.title}, ${artwork.artist}`}
-      crossOrigin="anonymous"
+      referrerPolicy="no-referrer"
       loading={loading}
       onError={() => setFailed(true)}
     />

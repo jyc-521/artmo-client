@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import type { Recommendation } from '../types';
 import { theme } from '../styles/theme';
 import { CARD_HEIGHT, CARD_WIDTH } from '../services/share';
+import { baseURL } from '../services/http';
 
 const SAFE = 250; // 인스타 스토리 위·아래 UI가 가리는 영역
 
@@ -22,7 +23,8 @@ const ShareCard = forwardRef<HTMLDivElement, { recommendation: Recommendation }>
         }}
       >
         <div style={{ background: c.surface, padding: 24, boxShadow: '0 2px 8px rgba(43,39,36,0.12)' }}>
-          <img src={art.imageUrl} crossOrigin="anonymous" alt=""
+          {/* 캔버스에 그리려면 CORS가 필요해서 서버가 대신 받아 준 이미지를 쓴다. */}
+          <img src={`${baseURL}/api/artworks/${art.id}/image`} crossOrigin="anonymous" alt=""
             style={{ width: '100%', height: 760, objectFit: 'contain', background: c.surface, display: 'block' }} />
         </div>
         <p style={{ margin: 0, fontFamily: theme.font.serif, fontSize: 50, lineHeight: 1.45, fontWeight: 600 }}>
