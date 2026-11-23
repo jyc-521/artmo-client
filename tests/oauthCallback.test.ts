@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { completeAuthCallback, oauthCallbackError } from "../src/utils/oauthCallback.ts";
+import { completeAuthCallback, EMAIL_CONFIRMED_NOTICE, oauthCallbackError } from "../src/utils/oauthCallback.ts";
 
 test("정상 PKCE 복귀 코드를 로그인 오류로 처리하지 않는다", () => {
   assert.equal(oauthCallbackError("?code=single-use-code", ""), null);
@@ -78,4 +78,19 @@ test("공급자가 로그인을 취소하면 코드를 교환하지 않는다", 
   const route = await completeAuthCallback(callback("?code=unused#error=access_denied"), auth);
   assert.match(decodeURIComponent(route), /로그인이 취소/);
   assert.equal(exchangeCalls, 0);
+});
+
+test("다른 브라우저에서 이메일 인증 링크를 열면 오류 대신 로그인 안내로 보낸다", async () => {
+  const auth = {
+    exchangeCodeForSession: async () => ({ data: { session: null }, error: { name: "AuthPKCECodeVerifierMissingError", code: "pkce_code_verifier_not_found" } }),
+  };
+  const route = await completeAuthCallback(new URL("https://artmo.test/auth/callback?code=c"), auth);
+  assert.equal(route, `/login?notice=${encodeURIComponent(EMAIL_CONFIRMED_NOTICE)}`);
+});
+
+test("만료된 이메일 인증 링크는 취소가 아니라 만료로 안내한다", () => {
+  assert.equal(
+    oauthCallbackError("?error=access_denied&error_code=otp_expired", ""),
+    "인증 링크가 만료되었거나 이미 사용되었습니다. 로그인해 보세요.",
+  );
 });

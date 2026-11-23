@@ -17,6 +17,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const from = (useLocation().state as { from?: string } | null)?.from ?? '/me';
   const callbackError = params.get('error');
+  const notice = params.get('notice');
 
   useEffect(() => {
     if (isAuthenticated) navigate(from, { replace: true });
@@ -39,6 +40,7 @@ export default function LoginPage() {
         <h1 className="h1" style={{ fontSize: 28 }}>로그인</h1>
         <p className="muted" style={{ margin: 0 }}>추천 기록과 저장한 작품을 모아 볼 수 있어요.</p>
         {!authConfigured && <p className="notice">로그인 설정(Supabase 환경변수)이 아직 없어요.</p>}
+        {notice && <p className="muted" role="status">{notice}</p>}
         {callbackError && <p className="field-error" role="alert">{callbackError}</p>}
         <div className="field">
           <label htmlFor="email">이메일</label>
