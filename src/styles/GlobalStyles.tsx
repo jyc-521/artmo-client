@@ -206,14 +206,19 @@ const styles = css`
   .gate-room { position: absolute; inset: 0; overflow-y: auto; display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 24px 0; color: ${r.text};
     background: radial-gradient(ellipse 60% 45% at 50% 0%, ${r.spot}, transparent 75%), radial-gradient(ellipse 50% 25% at 50% 100%, rgba(255, 236, 200, 0.05), transparent 70%); }
 
-  /* 휘어진 작품 벽(ArtworkCorridor가 각도를 계산) */
-  .corridor { height: 120px; overflow: hidden; perspective: 900px; perspective-origin: 50% 40%; flex-shrink: 0; }
-  @media (min-width: 900px) { .corridor { height: 180px; perspective: 1100px; } }
-  .corridor-track { display: flex; gap: 32px; width: max-content; height: 100%; transform-style: preserve-3d; will-change: transform; }
-  .corridor-item { margin: 0; height: 100%; flex-shrink: 0; will-change: transform; }
-  .corridor-item img { display: block; height: 100%; width: auto; box-shadow: 0 16px 26px -10px rgba(0, 0, 0, 0.85); }
+  /* 회전 전시대: 작품이 원기둥 둘레에 바깥을 보고 걸려 있고, 원기둥 전체가 한 방향으로 돈다(GPU 애니메이션).
+     --w: 작품 칸 너비, --r: 반지름(= (칸 너비+간격) / (2·tan(π/n))) */
+  .corridor { --w: 132px; --h: 104px; --r: 270px; height: 150px; flex-shrink: 0; perspective: 900px; perspective-origin: 50% 35%; overflow: visible; }
+  @media (min-width: 900px) { .corridor { --w: 230px; --h: 170px; --r: 490px; height: 230px; perspective: 1500px; } }
+  .carousel { position: relative; width: var(--w); height: var(--h); margin: 0 auto; transform-style: preserve-3d;
+    animation: carousel 90s linear infinite; }
+  @keyframes carousel { from { transform: translateZ(calc(var(--r) * -1)) rotateY(0deg); } to { transform: translateZ(calc(var(--r) * -1)) rotateY(-360deg); } }
+  .carousel-item { position: absolute; inset: 0; margin: 0; display: flex; align-items: center; justify-content: center; backface-visibility: hidden;
+    transform: rotateY(calc(360deg / var(--n) * var(--i))) translateZ(var(--r)); }
+  .carousel-item img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; box-shadow: 0 16px 26px -10px rgba(0, 0, 0, 0.85); }
+  @media (prefers-reduced-motion: reduce) { .carousel { animation: none; transform: translateZ(calc(var(--r) * -1)); } }
 
-  .gate-form { position: relative; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 520px; margin: 16px auto 0; padding: 0 52px; }
+  .gate-form { position: relative; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 520px; margin: 16px auto 0; padding: 0 60px; }
   @media (min-width: 900px) { .gate-form { padding: 0 24px; margin-top: 28px; } }
   .gate-form .gate-label { font-family: ${theme.font.serif}; font-size: 19px; font-weight: 600; line-height: 1.45; color: ${r.text}; text-align: center; }
   @media (min-width: 900px) { .gate-form .gate-label { font-size: 26px; } }
@@ -231,21 +236,32 @@ const styles = css`
   .enter-btn:not(:disabled):hover .enter-arrow { transform: translateX(6px); }
   .gate-info { margin: 0; text-align: center; font-size: 13px; color: ${r.textMuted}; }
 
-  /* 청동 문짝: 높이맵에 조명을 계산해 구운 이미지(public/doors). 활짝 열린 채로 양옆에 서 있다. */
-  .door { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 4; pointer-events: none;
-    background: #2A1F15 center / 100% 100% no-repeat; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.85); }
+  /* 청동 문짝: 높이맵에 조명·그림자를 계산해 구운 이미지(scripts/render-door.py → public/doors).
+     활짝 열린 채 양옆에 서 있고, 문 두께(옆면)와 문고리는 실제 3D 공간에 따로 놓여 입체감이 난다. */
+  .door { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 4; pointer-events: none; transform-style: preserve-3d;
+    background: #2A1F15 center / 100% 100% no-repeat; --kx: 50%; --ky: 46.1%; --kw: 44.6%; }
   .door-left { left: 0; transform-origin: left center; transform: rotateY(80deg); background-image: url(/doors/left_tall.webp); }
   .door-right { right: 0; transform-origin: right center; transform: rotateY(-80deg); background-image: url(/doors/right_tall.webp); }
   @media (min-width: 900px) {
-    .door-left { background-image: url(/doors/left_wide.webp); transform: rotateY(74deg); }
-    .door-right { background-image: url(/doors/right_wide.webp); transform: rotateY(-74deg); }
+    .door-left { background-image: url(/doors/left_wide.webp); transform: rotateY(72deg); --kx: 72.75%; --ky: 43.81%; --kw: 22.6%; }
+    .door-right { background-image: url(/doors/right_wide.webp); transform: rotateY(-72deg); --kx: 27.25%; --ky: 43.81%; --kw: 22.6%; }
   }
-  /* 전시실 쪽에서 오는 빛: 안쪽 가장자리는 밝고, 바깥(경첩) 쪽과 위아래는 어둡다 */
-  .door::after { content: ''; position: absolute; inset: 0; pointer-events: none; }
-  .door-left::after { background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent 25%, transparent 70%, rgba(0, 0, 0, 0.65)),
-    linear-gradient(to right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.15) 55%, rgba(255, 214, 160, 0.10)); }
-  .door-right::after { background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent 25%, transparent 70%, rgba(0, 0, 0, 0.65)),
-    linear-gradient(to left, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.15) 55%, rgba(255, 214, 160, 0.10)); }
+  /* 문 두께: 문틈 쪽 끝에 붙은 옆면 */
+  .door-edge { position: absolute; top: 0; bottom: 0; width: 34px;
+    background: linear-gradient(to bottom, #1A120B, #3A2A1B 30%, #2C2015 70%, #140E09); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6); }
+  .door-left .door-edge { right: 0; transform-origin: right center; transform: rotateY(90deg); }
+  .door-right .door-edge { left: 0; transform-origin: left center; transform: rotateY(-90deg); }
+  @media (max-width: 899px) { .door-edge { width: 12px; } }
+  /* 문고리: 받침판 위에 떠서 걸린 링 */
+  .door-knocker { position: absolute; left: var(--kx); top: var(--ky); width: var(--kw); aspect-ratio: 1;
+    background: url(/doors/knocker.webp) center / contain no-repeat; transform: translate(-50%, -20%) translateZ(22px);
+    filter: drop-shadow(0 14px 8px rgba(0, 0, 0, 0.75)); }
+  /* 조명: 위아래는 어둡고 경첩 쪽은 그늘(그림 자체의 입체 그림자는 이미지에 구워져 있다) */
+  .door::after { content: ''; position: absolute; inset: 0; pointer-events: none; transform: translateZ(0.1px); }
+  .door-left::after { background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 22%, transparent 72%, rgba(0, 0, 0, 0.6)),
+    linear-gradient(to right, rgba(0, 0, 0, 0.45), transparent 45%); }
+  .door-right::after { background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 22%, transparent 72%, rgba(0, 0, 0, 0.6)),
+    linear-gradient(to left, rgba(0, 0, 0, 0.45), transparent 45%); }
 
   /* 입장: 조명이 어두워지며 전시실로 */
   body::after { content: ''; position: fixed; inset: 0; z-index: 1000; pointer-events: none; background: ${r.bg}; opacity: 0; transition: opacity 0.55s ease; }

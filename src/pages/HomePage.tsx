@@ -108,8 +108,14 @@ export default function HomePage() {
               <p className="gate-info">입장 무료 · {isAuthenticated ? '하루 10회' : '하루 3회 (로그인 시 10회)'}</p>
             </form>
           </div>
-          <div className="door door-left" aria-hidden="true" />
-          <div className="door door-right" aria-hidden="true" />
+          <div className="door door-left" aria-hidden="true">
+            <span className="door-edge" />
+            <span className="door-knocker" />
+          </div>
+          <div className="door door-right" aria-hidden="true">
+            <span className="door-edge" />
+            <span className="door-knocker" />
+          </div>
         </div>
       </div>
     </section>

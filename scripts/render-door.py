@@ -1,5 +1,6 @@
 # 청동 문짝 높이맵(SVG) → SVG 조명 필터로 렌더 → PNG
 import sys
+KNOCK={}
 def leaf(W, H, cols, rows, mirror=False):
     m = 0.075*W            # 바깥 테
     g = 0.06*W             # 판넬 사이
@@ -49,9 +50,10 @@ def leaf(W, H, cols, rows, mirror=False):
             s += rosette(cx, cy, R)
     # 사자 받침 + 링 문고리 (문틈 쪽, 가운데 높이)
     kx, ky = KX, KY - KR*0.25
-    s.append(f"<circle cx='{kx}' cy='{ky-KR*0.55}' r='{KR*0.42}' fill='url(#boss)'/>")
-    s.append(f"<circle cx='{kx}' cy='{ky+KR*0.35}' r='{KR*0.82}' fill='none' stroke='url(#ring)' stroke-width='{KR*0.2}'/>")
-    s.append(f"<ellipse cx='{kx}' cy='{ky-KR*0.1}' rx='{KR*0.16}' ry='{KR*0.22}' fill='rgb(230,230,230)'/>")
+    # 받침판(문에 붙은 둥근 판)만 굽는다. 링과 사자 받침은 따로 떠 있는 3D 조각.
+    s.append(f"<circle cx='{kx}' cy='{ky-KR*0.55}' r='{KR*0.62}' fill='rgb(150,150,150)'/>")
+    s.append(f"<circle cx='{kx}' cy='{ky-KR*0.55}' r='{KR*0.52}' fill='rgb(200,200,200)'/>")
+    KNOCK.update(x=kx/W, y=(ky-KR*0.55)/H, r=KR/W)
     # 문틈 쪽 리벳 줄
     sx = W - m*0.5 if not mirror else m*0.5
     n = int(H/70)
@@ -61,6 +63,7 @@ def leaf(W, H, cols, rows, mirror=False):
     return "\n".join(s)
 
 def svg(W,H,cols,rows,mirror,az):
+    SHDX = f'{(-W/220 if not mirror else W/220):.1f}'
     return f"""<svg xmlns='http://www.w3.org/2000/svg' width='{W}' height='{H}' viewBox='0 0 {W} {H}'>
 <defs>
  <radialGradient id='boss'><stop offset='0' stop-color='#fff'/><stop offset='0.45' stop-color='#e8e8e8'/><stop offset='0.8' stop-color='#bbb'/><stop offset='1' stop-color='#888'/></radialGradient>
@@ -74,8 +77,8 @@ def svg(W,H,cols,rows,mirror,az):
   <feTurbulence type='fractalNoise' baseFrequency='0.09' numOctaves='2' seed='21' result='pit'/>
   <feComposite in='h1' in2='grain' operator='arithmetic' k2='1' k3='0.016' result='hg'/>
   <feComposite in='hg' in2='pit' operator='arithmetic' k2='1' k3='0.03' result='h'/>
-  <feDiffuseLighting in='h' surfaceScale='{W/90:.1f}' diffuseConstant='0.95' lighting-color='#ffffff' result='diff'><feDistantLight azimuth='{az}' elevation='42'/></feDiffuseLighting>
-  <feSpecularLighting in='h' surfaceScale='{W/90:.1f}' specularConstant='1.5' specularExponent='60' lighting-color='#ffdca6' result='spec'><feDistantLight azimuth='{az}' elevation='28'/></feSpecularLighting>
+  <feDiffuseLighting in='h' surfaceScale='{W/55:.1f}' diffuseConstant='0.95' lighting-color='#ffffff' result='diff'><feDistantLight azimuth='{az}' elevation='40'/></feDiffuseLighting>
+  <feSpecularLighting in='h' surfaceScale='{W/55:.1f}' specularConstant='1.5' specularExponent='60' lighting-color='#ffdca6' result='spec'><feDistantLight azimuth='{az}' elevation='28'/></feSpecularLighting>
   <feFlood flood-color='#4f361f' result='base'/>
   <feComposite in='base' in2='diff' operator='arithmetic' k1='1.25' result='lit'/>
   <!-- 녹 얼룩: 큰 무늬로 어둡고 탁하게 -->
@@ -93,7 +96,13 @@ def svg(W,H,cols,rows,mirror,az):
   <feColorMatrix in='h0' type='matrix' values='0 0 0 0 0.85  0 0 0 0 0.62  0 0 0 0 0.32  0 0 0 2.6 -2.05' result='wear'/>
   <feComposite in='wear' in2='grain' operator='arithmetic' k1='0' k2='0.55' k3='0' result='wear2'/>
   <feComposite in='wear2' in2='lit4' operator='over' result='lit5'/>
-  <feComposite in='lit5' in2='spec' operator='arithmetic' k2='1' k3='0.9' result='out'/>
+  <!-- 드리운 그림자: 위쪽에 더 높은 면이 있으면 그 아래는 어둡다(빛은 위에서) -->
+  <feOffset in='h1' dx='{SHDX}' dy='{W/70:.1f}' result='hoff'/>
+  <feComposite in='hoff' in2='h1' operator='arithmetic' k2='3.2' k3='-3.2' result='cast'/>
+  <feGaussianBlur in='cast' stdDeviation='{W/260:.1f}' result='castb'/>
+  <feColorMatrix in='castb' type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.85 0' result='castc'/>
+  <feComposite in='castc' in2='lit5' operator='over' result='lit6'/>
+  <feComposite in='lit6' in2='spec' operator='arithmetic' k2='1' k3='0.95' result='out'/>
   <feComposite in='out' in2='SourceGraphic' operator='in'/>
  </filter>
 </defs>
@@ -102,3 +111,4 @@ def svg(W,H,cols,rows,mirror,az):
 import json
 cfg=json.loads(sys.argv[1])
 open(cfg['out'],'w').write(svg(cfg['W'],cfg['H'],cfg['cols'],cfg['rows'],cfg['mirror'],cfg['az']))
+print(json.dumps({k: round(v,4) for k,v in KNOCK.items()}))
