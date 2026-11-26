@@ -60,26 +60,15 @@ export default function HomePage() {
   return (
     <section className="lobby">
       <div className="page wide lobby-inner">
-        <header className="lobby-banner">
-          <span className="lobby-eyebrow">ARTMO 상설전</span>
-          <h1 className="lobby-title">오늘의 기분<span className="lobby-title-mark">展</span></h1>
-          <p className="lobby-lead">당신이 남긴 한 문장에 어울리는 명화 한 점을 전시실에 걸어 드려요.</p>
-          <dl className="lobby-info">
-            <div><dt>소장</dt><dd>메트로폴리탄 미술관 명화</dd></div>
-            <div><dt>관람</dt><dd>{isAuthenticated ? '하루 10회' : <>하루 3회 <small>로그인 10회</small></>}</dd></div>
-            <div><dt>입장료</dt><dd>무료</dd></div>
-          </dl>
-        </header>
-
-        <form className="guestbook" onSubmit={submit} noValidate>
+        {/* 미술관 입구의 아치형 문. 문 너머에서 빛이 새어 나온다. */}
+        <form className="archway" onSubmit={submit} noValidate>
+          <span className="archway-eyebrow">ARTMO 상설전</span>
           <div className="field">
-            <label htmlFor="mood" className="guestbook-label">
-              <span>방명록</span>
-              지금 기분을 한 문장으로 남겨 주세요
-            </label>
+            <label htmlFor="mood" className="archway-label">지금 기분을<br />한 문장으로 남겨 주세요</label>
+            <p className="archway-lead">어울리는 명화 한 점을 전시실에 걸어 드려요.</p>
             <textarea
               id="mood"
-              className="guestbook-input"
+              className="archway-input"
               rows={3}
               maxLength={MAX + 20}
               value={sentence}
@@ -108,6 +97,9 @@ export default function HomePage() {
           <button type="submit" className="btn enter-btn" disabled={mutation.isPending || length === 0}>
             {mutation.isPending ? '작품을 거는 중…' : hint ? '다시 찾기' : <>전시실 입장 <span className="enter-arrow" aria-hidden="true">→</span></>}
           </button>
+          <p className="archway-info">
+            메트로폴리탄 미술관 명화 · 입장 무료 · {isAuthenticated ? '하루 10회' : '하루 3회 (로그인 시 10회)'}
+          </p>
         </form>
       </div>
 
