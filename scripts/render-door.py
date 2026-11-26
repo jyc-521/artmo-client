@@ -1,6 +1,8 @@
 # 청동 문짝 높이맵(SVG) → SVG 조명 필터로 렌더 → PNG
 import sys
+import math, random
 KNOCK={}
+TONES=[]
 def leaf(W, H, cols, rows, mirror=False):
     m = 0.075*W            # 바깥 테
     g = 0.06*W             # 판넬 사이
@@ -17,6 +19,13 @@ def leaf(W, H, cols, rows, mirror=False):
         for r in range(rows):
             x = m + c*(pw+g); y = top + r*(ph+g)
             knock = (c==kc and r==kr)
+            rnd = random.Random(c*31 + r*7 + (1 if mirror else 0))
+            tone = rnd.uniform(-0.22, 0.16)
+            col = '0,0,0' if tone < 0 else '255,200,130'
+            TONES.append(f"<rect x='{x-8}' y='{y-8}' width='{pw+16}' height='{ph+16}' fill='rgba({col},{abs(tone):.2f})' style='mix-blend-mode:{'multiply' if tone<0 else 'soft-light'}'/>")
+            if rnd.random() < 0.5:
+                wx = x + rnd.uniform(0.2,0.8)*pw; wy = y + rnd.uniform(0.2,0.8)*ph
+                TONES.append(f"<ellipse cx='{wx:.0f}' cy='{wy:.0f}' rx='{pw*rnd.uniform(0.2,0.4):.0f}' ry='{ph*rnd.uniform(0.15,0.3):.0f}' fill='url(#wearg)' style='mix-blend-mode:screen'/>")
             # 몰딩 테두리(볼록)
             s.append(f"<rect x='{x-6}' y='{y-6}' width='{pw+12}' height='{ph+12}' rx='3' fill='rgb(225,225,225)'/>")
             # 홈(오목)
@@ -29,12 +38,17 @@ def leaf(W, H, cols, rows, mirror=False):
             if knock:
                 KX, KY, KR = cx_, cy_, 0.3*min(pw,ph)
                 continue
-            s.append(f"<circle cx='{cx_}' cy='{cy_}' r='{mr}' fill='rgb(95,95,95)'/>")
-            s.append(f"<circle cx='{cx_}' cy='{cy_}' r='{mr*0.86}' fill='rgb(205,205,205)'/>")
-            s.append(f"<circle cx='{cx_}' cy='{cy_}' r='{mr*0.7}' fill='rgb(150,150,150)'/>")
-            s.append(f"<circle cx='{cx_}' cy='{cy_}' r='{mr*0.32}' fill='url(#boss)'/>")
+            if (c + r) % 2 == 0:
+                s.append(f"<circle cx='{cx_}' cy='{cy_}' r='{mr}' fill='rgb(95,95,95)'/>")
+                s.append(f"<circle cx='{cx_}' cy='{cy_}' r='{mr*0.86}' fill='rgb(205,205,205)'/>")
+                s.append(f"<circle cx='{cx_}' cy='{cy_}' r='{mr*0.7}' fill='rgb(150,150,150)'/>")
+                s.append(f"<circle cx='{cx_}' cy='{cy_}' r='{mr*0.32}' fill='url(#boss)'/>")
+            else:
+                for k in range(4):
+                    a = math.pi/4 + k*math.pi/2
+                    s.append(f"<ellipse cx='{cx_+math.cos(a)*mr*0.55:.1f}' cy='{cy_+math.sin(a)*mr*0.55:.1f}' rx='{mr*0.5:.1f}' ry='{mr*0.24:.1f}' transform='rotate({math.degrees(a):.0f} {cx_+math.cos(a)*mr*0.55:.1f} {cy_+math.sin(a)*mr*0.55:.1f})' fill='rgb(200,200,200)'/>")
+                s.append(f"<circle cx='{cx_}' cy='{cy_}' r='{mr*0.3}' fill='url(#boss)'/>")
     # 판넬 교차점 로제트(꽃 모양 장식)
-    import math
     def rosette(cx, cy, R):
         out=[f"<circle cx='{cx}' cy='{cy}' r='{R*1.25}' fill='rgb(150,150,150)'/>"]
         for k in range(8):
@@ -66,6 +80,7 @@ def svg(W,H,cols,rows,mirror,az):
     SHDX = f'{(-W/220 if not mirror else W/220):.1f}'
     return f"""<svg xmlns='http://www.w3.org/2000/svg' width='{W}' height='{H}' viewBox='0 0 {W} {H}'>
 <defs>
+ <radialGradient id='wearg'><stop offset='0' stop-color='rgba(255,210,140,0.12)'/><stop offset='1' stop-color='rgba(255,210,140,0)'/></radialGradient>
  <radialGradient id='boss'><stop offset='0' stop-color='#fff'/><stop offset='0.45' stop-color='#e8e8e8'/><stop offset='0.8' stop-color='#bbb'/><stop offset='1' stop-color='#888'/></radialGradient>
  <linearGradient id='ring' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#fff'/><stop offset='1' stop-color='#ddd'/></linearGradient>
  <radialGradient id='stud'><stop offset='0' stop-color='#fff'/><stop offset='0.7' stop-color='#ddd'/><stop offset='1' stop-color='#777'/></radialGradient>
@@ -106,7 +121,7 @@ def svg(W,H,cols,rows,mirror,az):
   <feComposite in='out' in2='SourceGraphic' operator='in'/>
  </filter>
 </defs>
-<g filter='url(#bronze)'>{leaf(W,H,cols,rows,mirror)}</g>
+<g filter='url(#bronze)'>{leaf(W,H,cols,rows,mirror)}</g><g>{''.join(TONES)}</g>
 </svg>"""
 import json
 cfg=json.loads(sys.argv[1])
