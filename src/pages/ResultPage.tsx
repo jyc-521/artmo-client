@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { SupportInfo } from '../types';
 import { toast } from 'react-toastify';
 import { recommendationService } from '../services/recommendationApi';
 import { artworkService } from '../services/artworkApi';
@@ -19,6 +20,7 @@ export default function ResultPage() {
   const { isAuthenticated } = useAuth();
   const cardRef = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState<'' | 'save' | 'share'>('');
+  const support = useQueryClient().getQueryData<SupportInfo>(['support', id]);
   const query = useQuery({ queryKey: ['recommendation', id], queryFn: () => recommendationService.get(id), enabled: Boolean(id) });
   const saveArtwork = useMutation({
     mutationFn: (artworkId: number) => artworkService.save(artworkId),
@@ -83,6 +85,25 @@ export default function ResultPage() {
             </ul>
           )}
           <p style={{ margin: 0, fontSize: 17, lineHeight: 1.75 }}>{rec.interpretation}</p>
+          {support && (
+            <div className="support-note" role="note">
+              <span>{support.message}</span>
+              <ul className="support-list">
+                {support.resources.map((r) => {
+                  const isWeb = r.contact.startsWith('https://');
+                  const href = isWeb ? r.contact : `tel:${r.contact.replace(/[^0-9]/g, '')}`;
+                  return (
+                    <li key={r.name}>
+                      <a href={href} target={isWeb ? '_blank' : undefined} rel={isWeb ? 'noopener noreferrer' : undefined}>
+                        {r.name} {isWeb ? '' : r.contact}
+                      </a>
+                      <span className="muted"> · {r.detail}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
           <span className="muted" style={{ fontSize: 13 }}>
             출처: {MUSEUM[art.source] ?? ''}{art.isPublicDomain ? ' · 퍼블릭 도메인' : ''}
           </span>

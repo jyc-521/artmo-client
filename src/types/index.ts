@@ -46,9 +46,8 @@ export interface Recommendation {
 }
 
 export type CreateRecommendationResult =
-  | { needsSupport: true; needsMoreDetail: false; message: string; resources: SupportResource[] }
   | { needsMoreDetail: true; hint: string }
-  | ({ needsMoreDetail: false } & Recommendation);
+  | ({ needsMoreDetail: false; support?: SupportInfo } & Recommendation);
 
 export interface Sponsorship {
   id: number;
@@ -70,7 +69,11 @@ export interface ProviderState {
   naver: boolean;
 }
 
-// 위기 신호 문장에 서버가 보내는 도움받을 곳 (contact는 전화번호 또는 https 주소)
+// 위기 신호 문장에 서버가 그림과 함께 보내는 도움받을 곳 (contact는 전화번호 또는 https 주소)
+export interface SupportInfo {
+  message: string;
+  resources: SupportResource[];
+}
 export interface SupportResource {
   name: string;
   contact: string;
