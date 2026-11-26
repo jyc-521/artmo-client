@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 import { recommendationService } from '../services/recommendationApi';
 import { useAuth } from '../contexts/AuthContext';
 import { messageOf, statusOf } from '../utils/errorMessage';
-import ArtworkCorridor from '../components/ArtworkCorridor';
 
 const MIN = 5;
 const MAX = 200;
@@ -64,63 +63,44 @@ export default function HomePage() {
 
   return (
     <section className="lobby">
-      {/* 활짝 열린 거대한 청동 대문. 그 너머 전시실에서 문장을 쓴다.
-          문 이미지는 scripts/render-door.py, 문고리는 scripts/render-knocker.py로 만든다. */}
+      {/* 어두운 전시실: 천장 조명 아래에서 문장을 남긴다. */}
       <div className="gate">
-        <div className="gate-lintel" aria-hidden="true"><span>ARTMO</span></div>
-        <div className="gate-frame">
-          <div className="gate-doorway">
-            <div className="gate-room">
-              <div className="gate-room-floor" aria-hidden="true" />
-              <ArtworkCorridor />
-                <form className="gate-form" onSubmit={submit} noValidate>
-                  <div className="field">
-                    <label htmlFor="mood" className="gate-label">지금 기분을 한 문장으로 남겨 주세요</label>
-                    <textarea
-                      id="mood"
-                      className="gate-input"
-                      rows={1}
-                      maxLength={MAX + 20}
-                      value={sentence}
-                      onChange={(e) => {
-                        setSentence(e.target.value);
-                        setFieldError('');
-                      }}
-                      placeholder="수평선 한가운데 선 고독한 사람 같아"
-                      aria-describedby="mood-help mood-hint"
-                      aria-invalid={Boolean(fieldError)}
-                      disabled={mutation.isPending}
-                    />
-                    <div className="field-help" id="mood-help">
-                      <span>{MIN}자 이상 {MAX}자 이하</span>
-                      <span aria-live="polite">{length} / {MAX}</span>
-                    </div>
-                    {fieldError && <p className="field-error" role="alert" style={{ margin: 0 }}>{fieldError}</p>}
-                  </div>
-                  {hint && (
-                    <div className="notice" id="mood-hint" role="status">
-                      <strong>감정이 조금 더 드러나면 좋아요</strong>
-                      <span>{hint}</span>
-                      <span style={{ fontSize: 14, opacity: 0.8 }}>예: 배부르고 나른해서 햇살 드는 창가에 누운 고양이 같아</span>
-                    </div>
-                  )}
-                  <button type="submit" className="btn enter-btn" disabled={mutation.isPending || length === 0}>
-                    {mutation.isPending ? '작품을 거는 중…' : hint ? '다시 찾기' : <>전시실 입장 <span className="enter-arrow" aria-hidden="true">→</span></>}
-                  </button>
-                  <p className="gate-info">입장 무료 · {isAuthenticated ? '하루 10회' : '하루 3회 (로그인 시 10회)'}</p>
-                </form>
+        <form className="gate-form" onSubmit={submit} noValidate>
+          <div className="field">
+            <label htmlFor="mood" className="gate-label">지금 기분을 한 문장으로 남겨 주세요</label>
+            <textarea
+              id="mood"
+              className="gate-input"
+              rows={1}
+              maxLength={MAX + 20}
+              value={sentence}
+              onChange={(e) => {
+                setSentence(e.target.value);
+                setFieldError('');
+              }}
+              placeholder="수평선 한가운데 선 고독한 사람 같아"
+              aria-describedby="mood-help mood-hint"
+              aria-invalid={Boolean(fieldError)}
+              disabled={mutation.isPending}
+            />
+            <div className="field-help" id="mood-help">
+              <span>{MIN}자 이상 {MAX}자 이하</span>
+              <span aria-live="polite">{length} / {MAX}</span>
             </div>
-            <div className="door door-left" aria-hidden="true">
-              <span className="door-edge" />
-              <span className="door-knocker" />
-            </div>
-            <div className="door door-right" aria-hidden="true">
-              <span className="door-edge" />
-              <span className="door-knocker" />
-            </div>
+            {fieldError && <p className="field-error" role="alert" style={{ margin: 0 }}>{fieldError}</p>}
           </div>
-          <div className="gate-threshold" aria-hidden="true" />
-        </div>
+          {hint && (
+            <div className="notice" id="mood-hint" role="status">
+              <strong>감정이 조금 더 드러나면 좋아요</strong>
+              <span>{hint}</span>
+              <span style={{ fontSize: 14, opacity: 0.8 }}>예: 배부르고 나른해서 햇살 드는 창가에 누운 고양이 같아</span>
+            </div>
+          )}
+          <button type="submit" className="btn enter-btn" disabled={mutation.isPending || length === 0}>
+            {mutation.isPending ? '작품을 거는 중…' : hint ? '다시 찾기' : <>전시실 입장 <span className="enter-arrow" aria-hidden="true">→</span></>}
+          </button>
+          <p className="gate-info">입장 무료 · {isAuthenticated ? '하루 10회' : '하루 3회 (로그인 시 10회)'}</p>
+        </form>
       </div>
     </section>
   );

@@ -178,74 +178,15 @@ const styles = css`
   .action-links .btn { white-space: nowrap; padding: 0 4px; }
   @media (min-width: 900px) { .result-room .result-layout { align-items: center; min-height: calc(100vh - 160px); } }
 
-  /* ── 입구(홈): 화면을 가득 채운 거대한 청동 대문 ──
-     돌 문틀이 화면 가로를 꽉 채우고, 활짝 열린 문짝이 양옆에 서 있다(움직이지 않음).
-     문 너머 전시실 안쪽 벽을 따라 작품이 돌고, 그 앞에서 문장을 쓴다. */
-  .lobby { position: relative; flex: 1; display: flex; flex-direction: column; background: #0B0A09; }
-  .gate { position: relative; flex: 1; display: flex; flex-direction: column; overflow: hidden; isolation: isolate;
-    min-height: max(600px, calc(100svh - 125px)); padding: 0 10px;
-    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='s' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='4' seed='2' stitchTiles='stitch'/><feDiffuseLighting surfaceScale='1.4' lighting-color='%23544c44' diffuseConstant='1'><feDistantLight azimuth='270' elevation='60'/></feDiffuseLighting></filter><rect width='400' height='400' filter='url(%23s)'/></svg>"), linear-gradient(to bottom, #1A1714, #0E0C0B); background-size: 400px 400px, auto; background-blend-mode: multiply, normal; }
-  @media (min-width: 900px) { .gate { min-height: max(640px, calc(100svh - 61px)); padding: 0 18px; } }
-  .gate-lintel { position: relative; z-index: 1; flex: 0 0 auto; height: 48px; display: flex; align-items: center; justify-content: center; }
-  .gate-lintel span { font-family: ${theme.font.serif}; font-weight: 700; font-size: 17px; letter-spacing: 18px; padding-left: 18px;
-    color: #8C744F; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 220, 160, 0.18); }
-  @media (min-width: 900px) { .gate-lintel { height: 56px; } .gate-lintel span { font-size: 22px; letter-spacing: 26px; padding-left: 26px; } }
+  /* ── 입구(홈): 어두운 전시실 ── 천장 조명이 떨어지는 자리에서 문장을 쓴다. 결과 화면·스토리 카드와 같은 톤. */
+  .lobby { position: relative; flex: 1; display: flex; flex-direction: column; background: ${r.bg}; }
+  .gate { position: relative; flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; isolation: isolate;
+    min-height: max(560px, calc(100svh - 125px)); padding: 40px 0 96px; color: ${r.text};
+    background: radial-gradient(ellipse 45% 55% at 50% 0%, rgba(255, 228, 185, 0.14), transparent 75%),
+      radial-gradient(ellipse 40% 18% at 50% 100%, rgba(255, 220, 160, 0.07), transparent 70%), ${r.bg}; }
+  @media (min-width: 900px) { .gate { min-height: max(600px, calc(100svh - 61px)); padding: 48px 0; } }
 
-  /* 돌 문틀: 화면 가로를 꽉 채운다 */
-  .gate-frame { position: relative; z-index: 1; flex: 1 1 auto; display: flex; flex-direction: column; padding: 12px 12px 0;
-    background: linear-gradient(to bottom, #3A332B, #2A251F 60%, #221E19);
-    box-shadow: inset 0 1px 0 rgba(255, 230, 190, 0.18), 0 0 0 4px #1E1A16, 0 0 0 5px rgba(255, 220, 170, 0.10), 0 -20px 60px rgba(0, 0, 0, 0.6); }
-  @media (min-width: 900px) { .gate-frame { padding: 20px 22px 0; } }
-  .gate-doorway { position: relative; flex: 1; perspective: 1800px; perspective-origin: 50% 45%; background: ${r.bg};
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.9), inset 0 26px 30px -14px rgba(0, 0, 0, 0.95); }
-  .gate-threshold { flex: 0 0 auto; height: 14px; margin: 0 -12px; background: linear-gradient(to bottom, #5A4E40, #3A3229 40%, #241F1A);
-    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 230, 190, 0.25); }
-  @media (min-width: 900px) { .gate-threshold { margin: 0 -22px; height: 18px; } }
-
-  /* 문 너머 전시실 */
-  .gate-room { position: absolute; inset: 0; z-index: 0; overflow: hidden; overflow-y: auto; display: flex; flex-direction: column; justify-content: center; padding: 16px 0 19%;
-    background: radial-gradient(ellipse 60% 45% at 50% 0%, rgba(255, 228, 185, 0.16), transparent 75%), ${r.bg}; color: ${r.text}; }
-  .gate-room-floor { position: absolute; left: 0; right: 0; bottom: 0; height: 22%; pointer-events: none;
-    background: radial-gradient(ellipse 40% 90% at 50% 0%, rgba(255, 220, 160, 0.12), transparent 70%), linear-gradient(to bottom, #1A1612, #261F18);
-    box-shadow: inset 0 1px 0 rgba(255, 230, 190, 0.08); }
-
-  /* 오목한 회전 전시대: 원기둥 '안쪽' 벽에 작품이 걸려 관람자를 향하고, 전체가 한 방향으로 돈다.
-     가운데 작품이 가장 깊이 들어가 있고 양옆 작품이 감싸듯 다가온다. 회전은 CSS(GPU) 애니메이션. */
-  .corridor { --w: 190px; --h: 150px; --r: 400px; position: relative; z-index: 1; height: 150px; flex-shrink: 0; width: 72%; margin: 0 auto; overflow: hidden; perspective: 460px; perspective-origin: 50% 50%; }
-  @media (min-width: 900px) { .corridor { --w: 300px; --h: 220px; --r: 640px; height: 240px; width: 50%; perspective: 760px; } }
-  .carousel { position: relative; width: var(--w); height: var(--h); margin: 0 auto; transform-style: preserve-3d; animation: carousel 110s linear infinite; }
-  @keyframes carousel { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
-  .carousel-item { position: absolute; inset: 0; margin: 0; display: flex; align-items: center; justify-content: center; backface-visibility: hidden;
-    transform: rotateY(calc(360deg / var(--n) * var(--i))) translateZ(calc(var(--r) * -1)); }
-  .carousel-item img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; box-shadow: 0 16px 26px -10px rgba(0, 0, 0, 0.85); }
-
-  /* 청동 문짝(scripts/render-door.py → public/doors): 경첩은 바깥, 활짝 열린 채 고정. 항상 전시실보다 앞. */
-  .door { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 4; pointer-events: none; transform-style: preserve-3d;
-    background: #2A1F15 center / 100% 100% no-repeat; --kx: 50%; --ky: 56.4%; --kw: 43%; }
-  .door-left { left: 0; transform-origin: left center; transform: rotateY(80deg); background-image: url(/doors/left_tall.webp); }
-  .door-right { right: 0; transform-origin: right center; transform: rotateY(-80deg); background-image: url(/doors/right_tall.webp); }
-  @media (min-width: 900px) {
-    .door { --ky: 43.88%; --kw: 20.8%; }
-    .door-left { transform: rotateY(70deg); background-image: url(/doors/left_wide.webp); --kx: 72.75%; }
-    .door-right { transform: rotateY(-70deg); background-image: url(/doors/right_wide.webp); --kx: 27.25%; }
-  }
-  .door-edge { position: absolute; top: 0; bottom: 0; width: 18px;
-    background: linear-gradient(to right, #1E150C, #5E4223 60%, #A87A3E); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.55); }
-  .door-edge::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 25%, transparent 75%, rgba(0,0,0,0.65)); }
-  .door-left .door-edge { right: 0; transform-origin: right center; transform: rotateY(90deg); }
-  .door-right .door-edge { left: 0; transform-origin: left center; transform: rotateY(-90deg); }
-  @media (max-width: 899px) { .door-edge { width: 10px; } }
-  .door-knocker { position: absolute; left: var(--kx); top: var(--ky); width: var(--kw); aspect-ratio: 1;
-    background: url(/doors/knocker.webp) center / contain no-repeat; transform: translate(-50%, -20%) translateZ(20px);
-    filter: drop-shadow(0 12px 7px rgba(0, 0, 0, 0.75)); }
-  .door::after { content: ''; position: absolute; inset: 0; pointer-events: none; transform: translateZ(0.1px); }
-  .door-left::after { background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 20%, transparent 74%, rgba(0, 0, 0, 0.55)),
-    linear-gradient(to right, rgba(0, 0, 0, 0.5), transparent 40%, transparent 90%, rgba(255, 200, 130, 0.22)); }
-  .door-right::after { background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 20%, transparent 74%, rgba(0, 0, 0, 0.55)),
-    linear-gradient(to left, rgba(0, 0, 0, 0.5), transparent 40%, transparent 90%, rgba(255, 200, 130, 0.22)); }
-
-  .gate-form { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 520px; margin: 8px auto 0; padding: 0 60px; }
-  @media (min-width: 900px) { .gate-form { padding: 0 24px; margin-top: 20px; } }
+  .gate-form { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 520px; margin: 0 auto; padding: 0 24px; }
   .gate-form .gate-label { font-family: ${theme.font.serif}; font-size: 18px; font-weight: 600; line-height: 1.45; color: ${r.text}; text-align: center; }
   @media (min-width: 900px) { .gate-form .gate-label { font-size: 22px; } }
   .gate-input { width: 100%; margin-top: 6px; border: 0; border-bottom: 1px solid rgba(238, 231, 220, 0.4); background: transparent; color: ${r.text};
@@ -262,10 +203,6 @@ const styles = css`
   .enter-arrow { display: inline-block; transition: transform 0.25s ease; }
   .enter-btn:not(:disabled):hover .enter-arrow { transform: translateX(6px); }
   .gate-info { margin: 0; text-align: center; font-size: 13px; color: ${r.textMuted}; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .carousel { animation: none; }
-  }
 
   /* 입장: 조명이 어두워지며 전시실로 */
   body::after { content: ''; position: fixed; inset: 0; z-index: 1000; pointer-events: none; background: ${r.bg}; opacity: 0; transition: opacity 0.55s ease; }
