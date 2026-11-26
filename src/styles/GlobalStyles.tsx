@@ -213,7 +213,7 @@ const styles = css`
   .corridor-item { margin: 0; height: 100%; flex-shrink: 0; will-change: transform; }
   .corridor-item img { display: block; height: 100%; width: auto; box-shadow: 0 16px 26px -10px rgba(0, 0, 0, 0.85); }
 
-  .gate-form { position: relative; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 520px; margin: 16px auto 0; padding: 0 40px; }
+  .gate-form { position: relative; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 520px; margin: 16px auto 0; padding: 0 52px; }
   @media (min-width: 900px) { .gate-form { padding: 0 24px; margin-top: 28px; } }
   .gate-form .gate-label { font-family: ${theme.font.serif}; font-size: 19px; font-weight: 600; line-height: 1.45; color: ${r.text}; text-align: center; }
   @media (min-width: 900px) { .gate-form .gate-label { font-size: 26px; } }
@@ -231,62 +231,27 @@ const styles = css`
   .enter-btn:not(:disabled):hover .enter-arrow { transform: translateX(6px); }
   .gate-info { margin: 0; text-align: center; font-size: 13px; color: ${r.textMuted}; }
 
-  /* 문틈으로 새어 나오는 빛: 문이 열리기 직전 가장 밝다 */
-  .gate-leak { position: absolute; z-index: 3; top: 0; bottom: 0; left: 50%; width: 3px; margin-left: -1.5px; pointer-events: none;
-    background: linear-gradient(to bottom, rgba(255, 224, 170, 0.5), #FFE3B0 50%, rgba(255, 224, 170, 0.6));
-    box-shadow: 0 0 18px 6px rgba(255, 210, 140, 0.45), 0 0 80px 30px rgba(255, 200, 120, 0.18);
-    animation: leak 3.6s ease-in-out both; }
-  @keyframes leak { 0% { opacity: 0.35; } 22% { opacity: 1; } 45% { opacity: 1; transform: scaleX(6); } 70%, 100% { opacity: 0; transform: scaleX(14); } }
-
-  /* 청동 문짝: 두드린 금속 결 + 녹 얼룩 + 깊게 파인 판넬 + 리벳 + 문고리 */
-  .door { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 4; pointer-events: none; overflow: hidden;
-    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600'><filter id='p' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.006 0.012' numOctaves='4' seed='9' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.06  0 0 0 0 0.038  0 0 0 0 0.02  0 0 0 1.1 -0.38'/></filter><rect width='600' height='600' filter='url(%23p)'/></svg>"), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='f' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' seed='4' stitchTiles='stitch'/><feDiffuseLighting surfaceScale='2.6' lighting-color='%23f0c690' diffuseConstant='1.05'><feDistantLight azimuth='225' elevation='48'/></feDiffuseLighting></filter><rect width='320' height='320' filter='url(%23f)'/></svg>"), linear-gradient(to bottom, #3B2C1E, #2A1F15 55%, #1C150F);
-    background-size: 600px 600px, 320px 320px, auto; background-blend-mode: normal, multiply, normal;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.8), inset 0 0 0 7px #1A130D, inset 0 0 0 8px rgba(255, 214, 160, 0.12); }
-  /* 조명: 위·아래는 어둡고, 문틈 쪽 가장자리는 새어 나온 빛을 받는다 */
-  .door::after { content: ''; position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 22%, transparent 70%, rgba(0, 0, 0, 0.7)); }
-  .door-left::after { background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 22%, transparent 70%, rgba(0, 0, 0, 0.7)),
-    linear-gradient(to right, rgba(0, 0, 0, 0.55), transparent 45%, rgba(255, 205, 140, 0.10) 92%, rgba(255, 215, 160, 0.32)); }
-  .door-right::after { background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 22%, transparent 70%, rgba(0, 0, 0, 0.7)),
-    linear-gradient(to left, rgba(0, 0, 0, 0.55), transparent 45%, rgba(255, 205, 140, 0.10) 92%, rgba(255, 215, 160, 0.32)); }
-  .door-left { left: 0; transform-origin: left center; animation: door-left 4.2s cubic-bezier(0.55, 0, 0.25, 1) 0.9s both; }
-  .door-right { right: 0; transform-origin: right center; animation: door-right 4.2s cubic-bezier(0.55, 0, 0.25, 1) 0.9s both; }
-  @keyframes door-left { from { transform: rotateY(0); } 6% { transform: rotateY(1.5deg); } to { transform: rotateY(84deg); } }
-  @keyframes door-right { from { transform: rotateY(0); } 6% { transform: rotateY(-1.5deg); } to { transform: rotateY(-84deg); } }
-
-  .door-panels { position: absolute; inset: 7% 11% 7% 11%; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, 1fr); gap: 5% 9%; }
-  .door-panel { position: relative; border-radius: 2px;
-    background: linear-gradient(160deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.05) 60%, rgba(255, 214, 160, 0.06));
-    box-shadow: inset 4px 5px 9px rgba(0, 0, 0, 0.75), inset -2px -3px 3px rgba(255, 210, 150, 0.14), 0 0 0 3px rgba(0, 0, 0, 0.3), 0 0 0 4px rgba(255, 214, 160, 0.10); }
-  /* 가운데가 도톰하게 솟은 판넬 */
-  .door-panel::after { content: ''; position: absolute; inset: 22% 20%; border-radius: 1px;
-    background: linear-gradient(160deg, rgba(255, 214, 160, 0.10), rgba(0, 0, 0, 0.25));
-    box-shadow: -2px -2px 3px rgba(255, 214, 160, 0.10), 3px 4px 8px rgba(0, 0, 0, 0.6); }
-  /* 문틈 쪽 세로 띠에 박힌 리벳 */
-  .door-studs { position: absolute; top: 4%; bottom: 4%; width: 16px;
-    background: radial-gradient(circle at 40% 35%, #C9A06A 0 2px, #6B4E2E 3.5px, #1C140D 5px, transparent 6px) center top / 16px 46px repeat-y; }
-  .door-left .door-studs { right: 3.5%; }
-  .door-right .door-studs { left: 3.5%; }
-  @media (max-width: 899px) { .door-studs { display: none; } }
-  /* 커다란 링 문고리 */
-  .door-knocker { position: absolute; top: 47%; width: 64px; height: 64px; margin-top: -32px; border-radius: 50%;
-    border: 7px solid #8A6A3E; box-shadow: inset 1px 2px 2px rgba(255, 230, 180, 0.45), inset -1px -2px 3px rgba(0, 0, 0, 0.7), 4px 8px 12px rgba(0, 0, 0, 0.7);
-    background: transparent; }
-  .door-knocker::before { content: ''; position: absolute; left: 50%; top: -20px; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, #D9B37A, #7A5A32 60%, #3A2A18); box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.7); }
-  .door-left .door-knocker { right: 9%; }
-  .door-right .door-knocker { left: 9%; }
-  @media (max-width: 899px) { .door-knocker { width: 40px; height: 40px; margin-top: -20px; border-width: 5px; } .door-knocker::before { width: 14px; height: 14px; margin-left: -7px; top: -13px; } }
+  /* 청동 문짝: 높이맵에 조명을 계산해 구운 이미지(public/doors). 활짝 열린 채로 양옆에 서 있다. */
+  .door { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 4; pointer-events: none;
+    background: #2A1F15 center / 100% 100% no-repeat; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.85); }
+  .door-left { left: 0; transform-origin: left center; transform: rotateY(80deg); background-image: url(/doors/left_tall.webp); }
+  .door-right { right: 0; transform-origin: right center; transform: rotateY(-80deg); background-image: url(/doors/right_tall.webp); }
+  @media (min-width: 900px) {
+    .door-left { background-image: url(/doors/left_wide.webp); transform: rotateY(74deg); }
+    .door-right { background-image: url(/doors/right_wide.webp); transform: rotateY(-74deg); }
+  }
+  /* 전시실 쪽에서 오는 빛: 안쪽 가장자리는 밝고, 바깥(경첩) 쪽과 위아래는 어둡다 */
+  .door::after { content: ''; position: absolute; inset: 0; pointer-events: none; }
+  .door-left::after { background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent 25%, transparent 70%, rgba(0, 0, 0, 0.65)),
+    linear-gradient(to right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.15) 55%, rgba(255, 214, 160, 0.10)); }
+  .door-right::after { background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent 25%, transparent 70%, rgba(0, 0, 0, 0.65)),
+    linear-gradient(to left, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.15) 55%, rgba(255, 214, 160, 0.10)); }
 
   /* 입장: 조명이 어두워지며 전시실로 */
   body::after { content: ''; position: fixed; inset: 0; z-index: 1000; pointer-events: none; background: ${r.bg}; opacity: 0; transition: opacity 0.55s ease; }
   body.entering::after { opacity: 1; }
 
   @media (prefers-reduced-motion: reduce) {
-    .door-left { animation: none; transform: rotateY(84deg); }
-    .door-right { animation: none; transform: rotateY(-84deg); }
-    .gate-leak { animation: none; opacity: 0; }
     body::after { transition: none; }
   }
 

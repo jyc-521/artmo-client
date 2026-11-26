@@ -8,7 +8,6 @@ import { messageOf, statusOf } from '../utils/errorMessage';
 import ArtworkCorridor from '../components/ArtworkCorridor';
 
 const MIN = 5;
-const PANELS = Array.from({ length: 8 }, (_, i) => i); // 문짝 한 쪽의 판넬 2열×4행
 const MAX = 200;
 
 export default function HomePage() {
@@ -65,7 +64,7 @@ export default function HomePage() {
 
   return (
     <section className="lobby">
-      {/* 거대한 청동 대문. 문틈으로 빛이 새고, 천천히 열리면 그 너머 어두운 전시실에서 문장을 쓴다. */}
+      {/* 활짝 열린 거대한 청동 대문. 그 너머 어두운 전시실에서 문장을 쓴다. 문 이미지는 scripts/render-door.py로 만든다. */}
       <div className="gate">
         <div className="gate-lintel" aria-hidden="true"><span>ARTMO</span></div>
         <div className="gate-floor" aria-hidden="true" />
@@ -109,17 +108,8 @@ export default function HomePage() {
               <p className="gate-info">입장 무료 · {isAuthenticated ? '하루 10회' : '하루 3회 (로그인 시 10회)'}</p>
             </form>
           </div>
-          <div className="gate-leak" aria-hidden="true" />
-          <div className="door door-left" aria-hidden="true">
-            <div className="door-panels">{PANELS.map((k) => <span className="door-panel" key={k} />)}</div>
-            <span className="door-studs" />
-            <span className="door-knocker" />
-          </div>
-          <div className="door door-right" aria-hidden="true">
-            <div className="door-panels">{PANELS.map((k) => <span className="door-panel" key={k} />)}</div>
-            <span className="door-studs" />
-            <span className="door-knocker" />
-          </div>
+          <div className="door door-left" aria-hidden="true" />
+          <div className="door door-right" aria-hidden="true" />
         </div>
       </div>
     </section>
