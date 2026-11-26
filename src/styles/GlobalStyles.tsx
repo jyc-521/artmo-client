@@ -178,6 +178,59 @@ const styles = css`
   .action-links .btn { white-space: nowrap; padding: 0 4px; }
   @media (min-width: 900px) { .result-room .result-layout { align-items: center; min-height: calc(100vh - 160px); } }
 
+  /* ── 입구 로비(홈) ── 밝은 미술관 로비. 결과 화면(어두운 전시실)과 대비된다. */
+  .lobby { position: relative; display: flex; flex-direction: column; flex: 1; overflow: hidden;
+    background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255, 255, 255, 0.9), transparent 70%), ${c.bg}; }
+  .lobby-inner { display: grid; gap: 40px; padding-top: 48px; padding-bottom: 32px; }
+  @media (min-width: 900px) { .lobby-inner { grid-template-columns: 1.1fr 1fr; gap: 72px; align-items: center; padding-top: 64px; padding-bottom: 40px; } }
+  .lobby-eyebrow { display: inline-flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; letter-spacing: 4px; color: ${c.accent}; }
+  .lobby-eyebrow::after { content: ''; width: 40px; height: 1px; background: ${c.accent}; }
+  .lobby-title { margin: 20px 0 0; font-family: ${theme.font.serif}; font-weight: 700; font-size: 52px; line-height: 1.15; letter-spacing: -1px; }
+  .lobby-title-mark { font-weight: 600; font-size: 0.62em; margin-left: 6px; color: ${c.accent}; vertical-align: 0.35em; }
+  @media (min-width: 900px) { .lobby-title { font-size: 84px; } }
+  .lobby-lead { margin: 20px 0 0; font-size: 17px; line-height: 1.7; color: ${c.textMuted}; max-width: 28em; }
+  .lobby-info { margin: 32px 0 0; display: flex; flex-wrap: wrap; border-top: 1px solid ${c.text}; }
+  .lobby-info > div { flex: 1 1 0; min-width: 96px; padding: 12px 16px 0 0; }
+  .lobby-info dt { font-size: 12px; letter-spacing: 2px; color: ${c.textMuted}; }
+  .lobby-info dd { margin: 4px 0 0; font-size: 14px; font-weight: 600; }
+  .lobby-info dd small { display: block; font-size: 12px; font-weight: 400; color: ${c.textMuted}; }
+
+  /* 방명록: 종이 위에 한 줄 쓰는 느낌 */
+  .guestbook { display: flex; flex-direction: column; gap: 20px; padding: 28px 24px 24px; background: ${c.surface};
+    border: 1px solid ${c.line}; border-radius: ${theme.radius.sm}; box-shadow: 0 24px 48px -24px rgba(43, 39, 36, 0.25); }
+  @media (min-width: 900px) { .guestbook { padding: 40px 36px 32px; } }
+  .guestbook .guestbook-label { display: flex; flex-direction: column; gap: 8px; font-family: ${theme.font.serif}; font-size: 22px; font-weight: 600; line-height: 1.4; color: ${c.text}; }
+  .guestbook .guestbook-label span { font-family: ${theme.font.sans}; font-size: 12px; font-weight: 600; letter-spacing: 4px; color: ${c.accent}; }
+  .guestbook-input { width: 100%; border: 0; border-bottom: 1px solid ${c.text}; background:
+    repeating-linear-gradient(to bottom, transparent 0, transparent 35px, ${c.line} 35px, ${c.line} 36px);
+    padding: 6px 0 0; font-family: ${theme.font.serif}; font-size: 19px; line-height: 36px; resize: none; margin-top: 8px; }
+  .guestbook-input:focus { outline: none; border-bottom-color: ${c.accent}; }
+  .guestbook-input::placeholder { color: ${c.textMuted}; opacity: 0.7; }
+  .enter-btn { justify-content: space-between; }
+  .enter-arrow { display: inline-block; transition: transform 0.25s ease; }
+  .enter-btn:not(:disabled):hover .enter-arrow { transform: translateX(6px); }
+
+  /* 복도: 실제 소장 작품이 천천히 흘러간다 */
+  .corridor-wrap { padding: 8px 0 120px; }
+  @media (min-width: 900px) { .corridor-wrap { padding-bottom: 48px; } }
+  .corridor-caption { max-width: ${theme.wideWidth}; margin: 0 auto 14px; padding: 0 20px; font-size: 12px; letter-spacing: 3px; color: ${c.textMuted}; }
+  .corridor { height: 132px; overflow: hidden; -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent); }
+  @media (min-width: 900px) { .corridor { height: 168px; } }
+  .corridor-track { display: flex; gap: 36px; width: max-content; height: 100%; animation: corridor 90s linear infinite; }
+  .corridor:hover .corridor-track { animation-play-state: paused; }
+  .corridor-item { margin: 0; height: 100%; flex-shrink: 0; }
+  .corridor-item img { display: block; height: 100%; width: auto; box-shadow: 0 10px 22px -8px rgba(43, 39, 36, 0.45); }
+  @keyframes corridor { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* 입장: 조명이 어두워지며 전시실로 */
+  body::after { content: ''; position: fixed; inset: 0; z-index: 1000; pointer-events: none; background: ${r.bg}; opacity: 0; transition: opacity 0.55s ease; }
+  body.entering::after { opacity: 1; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .corridor-track { animation: none; }
+    body::after { transition: none; }
+  }
+
   .spinner { width: 28px; height: 28px; border: 3px solid ${c.line}; border-top-color: ${c.accent}; border-radius: 50%; animation: spin 0.9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }
