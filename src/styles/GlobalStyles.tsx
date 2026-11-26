@@ -178,55 +178,80 @@ const styles = css`
   .action-links .btn { white-space: nowrap; padding: 0 4px; }
   @media (min-width: 900px) { .result-room .result-layout { align-items: center; min-height: calc(100vh - 160px); } }
 
-  /* ── 입구 로비(홈) ── 밝은 미술관 로비. 결과 화면(어두운 전시실)과 대비된다. */
-  .lobby { position: relative; display: flex; flex-direction: column; flex: 1; overflow: hidden;
-    background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255, 255, 255, 0.9), transparent 70%), ${c.bg}; }
-  .lobby-inner { display: flex; justify-content: center; align-items: flex-start; flex: 0 0 auto; padding-top: 40px; padding-bottom: 24px; }
-  @media (min-width: 900px) {
-    .lobby { justify-content: center; }
-    .lobby-inner { position: relative; z-index: 1; padding-top: 40px; padding-bottom: 40px; }
-    /* PC: 휘어진 작품 벽이 아치 문 뒤로 지나간다 */
-    .corridor-wrap { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-46%); padding: 0; z-index: 0; }
-    .corridor-caption { display: none; }
-  }
+  /* ── 입구(홈): 미술관 정면 ── 돌벽에 새긴 이름, 두께가 있는 큰 대문, 안쪽으로 열리는 문짝.
+     문 너머는 결과 화면과 같은 어두운 전시실이라, 입구에서 이미 전시실이 들여다보인다. */
+  .lobby { position: relative; flex: 1; display: flex; flex-direction: column;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='120'><g fill='none' stroke='%236b5a48' stroke-opacity='0.13'><path d='M0 .5H240M0 60.5H240M.5 0V60M120.5 60V120'/></g><g stroke='%23ffffff' stroke-opacity='0.5'><path d='M0 1.5H240M0 61.5H240'/></g></svg>"),
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 252, 245, 0.7), transparent 70%),
+      linear-gradient(to bottom, #ECE5DA, #E2D9CB 70%, #D6CCBC);
+    background-size: 240px 120px, auto, auto; background-position: center top, center, center; }
+  .facade { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 28px 14px 104px; }
+  @media (min-width: 900px) { .facade { padding: 24px 20px 36px; } }
+  /* 돌에 새긴 글자: 위쪽은 그림자, 아래쪽은 빛을 받아 파인 것처럼 */
+  .facade-name { margin: 0; font-family: ${theme.font.serif}; font-weight: 700; font-size: 40px; letter-spacing: 22px; padding-left: 22px;
+    color: #CFC5B5; text-shadow: 0 -1px 0 rgba(70, 58, 45, 0.45), 0 1px 0 rgba(255, 255, 255, 0.8); }
+  @media (min-width: 900px) { .facade-name { font-size: 52px; letter-spacing: 30px; padding-left: 30px; } }
+  .facade-plaque { margin: 4px 0 26px; font-size: 12px; letter-spacing: 3px; color: #7A6E60; }
 
-  /* 아치형 입구: 위가 둥근 문, 안쪽은 문 너머 빛처럼 밝다 */
-  .archway { position: relative; width: 100%; max-width: 520px; display: flex; flex-direction: column; align-items: stretch; gap: 20px;
-    padding: 96px 28px 32px; text-align: center; border-radius: 260px 260px 28px 28px;
-    background: radial-gradient(ellipse 80% 60% at 50% 18%, #FFFFFF, #FBF9F5 60%, #F8F5F0);
-    box-shadow: inset 0 0 0 1px rgba(43, 39, 36, 0.08), 0 40px 80px -40px rgba(43, 39, 36, 0.35); }
-  .archway::before { content: ''; position: absolute; inset: -14px; border-radius: 274px 274px 40px 40px; border: 1px solid rgba(43, 39, 36, 0.12); pointer-events: none; }
-  @media (min-width: 900px) { .archway { padding: 96px 56px 36px; border-radius: 300px 300px 32px 32px; } .archway::before { border-radius: 314px 314px 44px 44px; } }
-  .archway-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 5px; color: ${c.accent}; }
-  .archway .archway-label { font-family: ${theme.font.serif}; font-size: 26px; font-weight: 700; line-height: 1.45; color: ${c.text}; }
-  @media (min-width: 900px) { .archway .archway-label { font-size: 32px; } }
-  .archway-lead { margin: 4px 0 12px; font-size: 15px; color: ${c.textMuted}; }
-  .archway-input { width: 100%; border: 1px solid transparent; border-radius: 24px; background: rgba(246, 243, 238, 0.9);
-    padding: 18px 22px; font-family: ${theme.font.serif}; font-size: 18px; line-height: 1.7; resize: none; text-align: left;
-    box-shadow: inset 0 2px 6px rgba(43, 39, 36, 0.06); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
-  .archway-input:focus { outline: none; border-color: ${c.accent}; box-shadow: 0 0 0 4px rgba(31, 58, 95, 0.12); }
-  .archway-input::placeholder { color: ${c.textMuted}; opacity: 0.7; }
-  .archway .field-help { padding: 0 8px; }
-  .archway .notice { text-align: left; }
-  .enter-btn { border-radius: 999px; gap: 12px; }
-  .enter-arrow { display: inline-block; transition: transform 0.25s ease; }
-  .enter-btn:not(:disabled):hover .enter-arrow { transform: translateX(6px); }
-  .archway-info { margin: 0; font-size: 13px; color: ${c.textMuted}; }
-
-  /* 복도: 실제 소장 작품이 천천히 흘러간다 */
-  .corridor-wrap { padding: 8px 0 120px; }
-  .corridor-caption { margin: 0 auto 16px; padding: 0 20px; text-align: center; font-size: 12px; letter-spacing: 3px; color: ${c.textMuted}; }
+  /* 문틀: 여러 겹 몰딩 */
+  .portal { position: relative; width: min(820px, 100%); padding: 14px; background: #E2D9CB;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 0 0 6px #D6CCBB, 0 0 0 7px rgba(90, 75, 60, 0.25), 0 0 0 16px #E6DED2, 0 0 0 17px rgba(90, 75, 60, 0.2), 0 30px 60px -20px rgba(60, 48, 36, 0.45); }
+  /* 문 안쪽: 벽 두께(측면)가 보이도록 안쪽 그림자 */
+  .portal-opening { position: relative; overflow: hidden; perspective: 1600px; background: ${r.bg};
+    box-shadow: inset 22px 0 30px -12px rgba(0, 0, 0, 0.75), inset -22px 0 30px -12px rgba(0, 0, 0, 0.75), inset 0 26px 30px -14px rgba(0, 0, 0, 0.8); }
+  .portal-room { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 36px 0 28px; color: ${r.text};
+    background: radial-gradient(ellipse 55% 40% at 50% 0%, ${r.spot}, transparent 75%),
+      radial-gradient(ellipse 70% 30% at 50% 100%, rgba(255, 236, 200, 0.06), transparent 70%); }
+  @media (min-width: 900px) { .portal-room { min-height: min(600px, calc(100vh - 250px)); justify-content: space-between; padding: 32px 0 28px; } }
+  /* 휘어진 작품 벽: 실제 소장 작품이 오목한 벽을 따라 흘러간다(ArtworkCorridor가 각도를 계산) */
   .corridor { height: 150px; overflow: hidden; perspective: 900px; perspective-origin: 50% 40%; }
-  @media (min-width: 900px) { .corridor { height: 270px; perspective: 1100px; } }
   .corridor-track { display: flex; gap: 32px; width: max-content; height: 100%; transform-style: preserve-3d; will-change: transform; }
   .corridor-item { margin: 0; height: 100%; flex-shrink: 0; will-change: transform; }
-  .corridor-item img { display: block; height: 100%; width: auto; box-shadow: 0 14px 24px -10px rgba(43, 39, 36, 0.5); }
+  .corridor-item img { display: block; height: 100%; width: auto; }
+  .portal-room .corridor { height: 130px; }
+  @media (min-width: 900px) { .portal-room .corridor { height: 190px; perspective: 1000px; } }
+  .portal-room .corridor-item img { box-shadow: 0 16px 26px -10px rgba(0, 0, 0, 0.85); }
+
+  .portal-form { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 16px; width: 100%; max-width: 520px; margin: 20px auto 0; padding: 0 44px; }
+  @media (min-width: 900px) { .portal-form { padding: 0 24px; } }
+  .portal-form .portal-label { font-family: ${theme.font.serif}; font-size: 19px; font-weight: 600; line-height: 1.45; color: ${r.text}; text-align: center; }
+  @media (min-width: 900px) { .portal-form .portal-label { font-size: 26px; } }
+  .portal-input { width: 100%; margin-top: 10px; border: 0; border-bottom: 1px solid rgba(238, 231, 220, 0.45); background: transparent; color: ${r.text};
+    padding: 8px 2px; font-family: ${theme.font.serif}; font-size: 17px; line-height: 1.6; resize: none; text-align: center; }
+  @media (min-width: 900px) { .portal-input { font-size: 19px; } }
+  .portal-input:focus { outline: none; border-bottom-color: ${r.accent}; }
+  .portal-input::placeholder { color: ${r.textMuted}; opacity: 0.75; }
+  .portal-form .field-help { color: ${r.textMuted}; }
+  .portal-form .field-error { color: #F0A49A; }
+  .portal-form .notice { background: ${r.surface}; border-color: ${r.line}; color: ${r.text}; }
+  .portal-form .enter-btn { background: ${r.accent}; border-color: ${r.accent}; color: ${r.accentText}; border-radius: 999px; gap: 12px; }
+  .portal-form .enter-btn:disabled { background: transparent; color: ${r.textMuted}; border-color: ${r.line}; filter: none; cursor: not-allowed; }
+  .enter-arrow { display: inline-block; transition: transform 0.25s ease; }
+  .enter-btn:not(:disabled):hover .enter-arrow { transform: translateX(6px); }
+  .portal-info { margin: 0; text-align: center; font-size: 13px; color: ${r.textMuted}; }
+
+  /* 문짝: 청동 문. 들어오면 안쪽으로 천천히 열려 양옆에 얇게 남는다. */
+  .door { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 2; pointer-events: none;
+    background:
+      linear-gradient(to right, rgba(255, 255, 255, 0.06), transparent 30%, rgba(0, 0, 0, 0.25)),
+      repeating-linear-gradient(to bottom, transparent 0, transparent 22%, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.35) 22.6%, rgba(255, 220, 160, 0.10) 22.6%, rgba(255, 220, 160, 0.10) 23.2%),
+      linear-gradient(to bottom, #3A2F25, #2A221B 60%, #231C16);
+    box-shadow: inset 0 0 0 10px rgba(0, 0, 0, 0.25), inset 0 0 0 11px rgba(255, 220, 160, 0.12); }
+  .door-left { left: 0; transform-origin: left center; animation: door-left 2.2s cubic-bezier(0.6, 0, 0.2, 1) 0.4s both; }
+  .door-right { right: 0; transform-origin: right center; animation: door-right 2.2s cubic-bezier(0.6, 0, 0.2, 1) 0.4s both; }
+  .door-left::after, .door-right::after { content: ''; position: absolute; top: 50%; width: 6px; height: 46px; margin-top: -23px; border-radius: 3px; background: linear-gradient(#E8C987, #9C7A3E); }
+  .door-left::after { right: 18px; }
+  .door-right::after { left: 18px; }
+  @keyframes door-left { from { transform: rotateY(0); } to { transform: rotateY(86deg); } }
+  @keyframes door-right { from { transform: rotateY(0); } to { transform: rotateY(-86deg); } }
 
   /* 입장: 조명이 어두워지며 전시실로 */
   body::after { content: ''; position: fixed; inset: 0; z-index: 1000; pointer-events: none; background: ${r.bg}; opacity: 0; transition: opacity 0.55s ease; }
   body.entering::after { opacity: 1; }
 
   @media (prefers-reduced-motion: reduce) {
+    .door-left { animation: none; transform: rotateY(86deg); }
+    .door-right { animation: none; transform: rotateY(-86deg); }
     body::after { transition: none; }
   }
 
