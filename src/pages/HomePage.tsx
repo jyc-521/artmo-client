@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { recommendationService } from '../services/recommendationApi';
 import { useAuth } from '../contexts/AuthContext';
 import { messageOf, statusOf } from '../utils/errorMessage';
+import type { SupportResource } from '../types';
 
 const MIN = 5;
 const MAX = 200;
@@ -13,6 +14,7 @@ export default function HomePage() {
   const [sentence, setSentence] = useState('');
   const [hint, setHint] = useState('');
   const [fieldError, setFieldError] = useState('');
+  const [support, setSupport] = useState<{ message: string; resources: SupportResource[] } | null>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isAuthenticated } = useAuth();
@@ -21,6 +23,10 @@ export default function HomePage() {
   const mutation = useMutation({
     mutationFn: (text: string) => recommendationService.create(text),
     onSuccess: (result) => {
+      if ('needsSupport' in result) {
+        setSupport({ message: result.message, resources: result.resources });
+        return;
+      }
       if (result.needsMoreDetail) {
         setHint(result.hint);
         return;
@@ -38,6 +44,7 @@ export default function HomePage() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setHint('');
+    setSupport(null);
     setFieldError('');
     if (length < MIN || length > MAX) {
       setFieldError(`${MIN}자 이상 ${MAX}자 이하로 써 주세요.`);
@@ -79,6 +86,26 @@ export default function HomePage() {
             <strong>감정이 조금 더 드러나면 좋아요</strong>
             <span>{hint}</span>
             <span className="muted" style={{ fontSize: 14 }}>예: 배부르고 나른해서 햇살 드는 창가에 누운 고양이 같아</span>
+          </div>
+        )}
+        {support && (
+          <div className="notice support" role="alert">
+            <strong>잠깐, 그림보다 먼저 전하고 싶은 말이 있어요</strong>
+            <span>{support.message}</span>
+            <ul className="support-list">
+              {support.resources.map((r) => {
+                const isWeb = r.contact.startsWith('https://');
+                const href = isWeb ? r.contact : `tel:${r.contact.replace(/[^0-9]/g, '')}`;
+                return (
+                  <li key={r.name}>
+                    <a href={href} target={isWeb ? '_blank' : undefined} rel={isWeb ? 'noopener noreferrer' : undefined}>
+                      <strong>{r.name}</strong> {isWeb ? '바로가기' : r.contact}
+                    </a>
+                    <span className="muted"> · {r.detail}</span>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         )}
         <button type="submit" className="btn" disabled={mutation.isPending || length === 0}>

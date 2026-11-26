@@ -46,6 +46,7 @@ export interface Recommendation {
 }
 
 export type CreateRecommendationResult =
+  | { needsSupport: true; needsMoreDetail: false; message: string; resources: SupportResource[] }
   | { needsMoreDetail: true; hint: string }
   | ({ needsMoreDetail: false } & Recommendation);
 
@@ -67,4 +68,11 @@ export interface ProviderState {
   email: boolean;
   google: boolean;
   naver: boolean;
+}
+
+// 위기 신호 문장에 서버가 보내는 도움받을 곳 (contact는 전화번호 또는 https 주소)
+export interface SupportResource {
+  name: string;
+  contact: string;
+  detail: string;
 }

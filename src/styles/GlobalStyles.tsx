@@ -58,6 +58,9 @@ const styles = css`
   .field-help { display: flex; justify-content: space-between; font-size: 13px; color: ${c.textMuted}; }
 
   .notice { background: ${c.surfaceMuted}; border-radius: ${theme.radius.md}; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; }
+  .notice.support { background: ${c.surface}; border: 1px solid ${c.accent}; }
+  .support-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .support-list a { color: ${c.accent}; text-decoration: underline; text-underline-offset: 3px; }
   .tag { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border: 1px solid ${c.line}; border-radius: ${theme.radius.pill}; font-size: 13px; background: ${c.surface}; color: ${c.text}; }
   .tags { display: flex; flex-wrap: wrap; gap: 8px; }
   .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
